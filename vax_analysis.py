@@ -51,11 +51,11 @@ total_sinovac = df_t_vax['sinovac'].sum()
 total_sinopharm = df_t_vax['sinopharm'].sum()
 
 df_doses = pd.DataFrame({
-    'pfizer' : total_pfizer,
-    'astrazeneca' : total_astra,
-    'sinovac' : total_sinovac,
-    'sinopharm' : total_sinopharm},
-    index=['total_doses'])
+    'pfizer' : ['Pfizer', total_pfizer],
+    'astrazeneca' : ['Astra', total_astra],
+    'sinovac' : ['Sinovac', total_sinovac],
+    'sinopharm' : ['Sinopharm', total_sinopharm]},
+    index=['vaxtype','total_doses'])
 
 # Cleaning AEFI dataset
 vaxgroups = df_aefi.groupby('vaxtype')
@@ -72,5 +72,14 @@ df_aefi_total = pd.DataFrame({
     'sinopharm' : aefi_sp
     })
 
-df_clean = pd.concat([df_aefi_total, df_doses])
+df_clean = pd.concat([df_doses, df_aefi_total])
+df_clean = df_clean.T
 df_clean.to_csv(filepath+'/for_analysis.csv', index=False)
+
+# ANALYTICS, part 1
+
+serious_pfizer = df_clean['pfizer'].loc['daily_serious_npra'] / df_clean['pfizer'].loc['total_doses']
+serious_astra = df_clean['astrazeneca'].loc['daily_serious_npra'] / df_clean['astrazeneca'].loc['total_doses']
+serious_sv = df_clean['sinovac'].loc['daily_serious_npra'] / df_clean['sinovac'].loc['total_doses']
+serious_sp = df_clean['sinopharm'].loc['daily_serious_npra'] / df_clean['sinopharm'].loc['total_doses']
+

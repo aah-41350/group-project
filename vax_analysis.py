@@ -1,76 +1,45 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Nov 29 08:13:05 2023
-
-@author: azfar
-"""
 
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
-import seaborn
 
 filepath = '/Users/azfar/Documents/GitHub/group-project/Data Files'
 
 # Import original datasets into specified DataFrames
-df_t_vax = pd.read_csv(filepath+'/vax_malaysia.csv')
-df_aefi = pd.read_csv(filepath+'/aefi.csv')
+df = pd.read_csv(filepath+'/for_analysis.csv')
 
-# Truncate unnecessary columns
-df_t_vax.drop(columns=['cansino','cansino3','cansino4','pending1','pending2',
-                       'pending3','pending4'], inplace=True)
-df_t_vax.drop(columns=['daily_partial','daily_full','daily_booster',
-                       'daily_booster2'], inplace=True)
-df_t_vax.drop(df_t_vax.columns[[2,3,4,5,6,7,8,9,10,11,12,13,15,16,17,18,19,
-                                20,21,22]], axis=1, inplace=True)
+# Distribution of total doses between brands
+total_allvax = df['total_doses'].sum()
 
-# Consolidate the different vaccine doses into single columns
-cols = ['pfizer1','pfizer2','pfizer3','pfizer4']
-df_t_vax['pfizer'] = df_t_vax[cols].sum(1)
-df_t_vax.drop(cols, axis=1, inplace=True)
+print('pfizer:'+str(df['total_doses'].loc[0])+'\n'+
+      'astra: '+str(df['total_doses'].loc[1])+'\n'+
+      'svac: '+str(df['total_doses'].loc[2])+'\n'+
+      'spharm: '+str(df['total_doses'].loc[3]))
+pct_pfizer = 45070100 / total_allvax * 100
+pct_astra = 5708790 / total_allvax * 100
+pct_sinov = 21584481 / total_allvax * 100
+pct_sinop = 44309 / total_allvax * 100
 
-cols1 = ['sinovac1','sinovac2','sinovac3','sinovac4']
-df_t_vax['sinovac'] = df_t_vax[cols1].sum(1)
-df_t_vax.drop(cols1, axis=1, inplace=True)
+# Incidence of AEFI in all brands
+aefi_pfizer = float(df['daily_total'].loc[0]) / 45070100
+aefi_astra = float(df['daily_total'].loc[1]) / 5708790
+aefi_sinov = float(df['daily_total'].loc[2]) / 21584481
+aefi_sinop = float(df['daily_total'].loc[3]) / 44309
 
-cols2 = ['astra1','astra2','astra3','astra4']
-df_t_vax['astra'] = df_t_vax[cols2].sum(1)
-df_t_vax.drop(cols2, axis=1, inplace=True)
+pct_aefi_pfizer = aefi_pfizer * 100
+pct_aefi_astra = aefi_astra * 100
+pct_aefi_sinov = aefi_sinov * 100
+pct_aefi_sinop = aefi_sinop * 100
 
-cols3 = ['sinopharm1','sinopharm2','sinopharm3','sinopharm4']
-df_t_vax['sinopharm'] = df_t_vax[cols3].sum(1)
-df_t_vax.drop(cols3, axis=1, inplace=True)
+print(pct_aefi_astra)
+print(pct_aefi_pfizer)
+print(pct_aefi_sinov)
+print(pct_aefi_sinop)
 
-# Save the edited DataFrame into a new .csv file
-df_t_vax.to_csv(filepath+'/totalvax.csv', index=False)
+labels = 'Pfizer', 'Astrazeneca', 'Sinovac', 'Sinopharm'
+sizes = [45070100, 5708790, 21584481, 44309]
 
-total_pfizer = df_t_vax['pfizer'].sum()
-total_astra = df_t_vax['astra'].sum()
-total_sinovac = df_t_vax['sinovac'].sum()
-total_sinopharm = df_t_vax['sinopharm'].sum()
-
-df_doses = pd.DataFrame({
-    'pfizer' : total_pfizer,
-    'astrazeneca' : total_astra,
-    'sinovac' : total_sinovac,
-    'sinopharm' : total_sinopharm},
-    index=['total_doses'])
-
-# Cleaning AEFI dataset
-vaxgroups = df_aefi.groupby('vaxtype')
-aefi_p = vaxgroups.get_group('pfizer').drop(columns=['date','vaxtype']).sum()
-aefi_a = vaxgroups.get_group('astrazeneca').drop(columns=['date','vaxtype']).sum()
-aefi_sv = vaxgroups.get_group('sinovac').drop(columns=['date','vaxtype']).sum()
-aefi_sp = vaxgroups.get_group('sinopharm').drop(columns=['date','vaxtype']).sum()
-
-# New DataFrame for cummulative sum of reported AEFI, sorted by brand
-df_aefi_total = pd.DataFrame({
-    'pfizer' : aefi_p,
-    'astrazeneca' : aefi_a,
-    'sinovac' : aefi_sv,
-    'sinopharm' : aefi_sp
-    })
-
-df_clean = pd.concat([df_aefi_total, df_doses])
-df_clean.to_csv(filepath+'/for_analysis.csv', index=False)
+fig, ax = plt.subplots()
+ax.pie(sizes, labels=labels)

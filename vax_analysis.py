@@ -38,6 +38,7 @@ print(pct_aefi_pfizer)
 print(pct_aefi_sinov)
 print(pct_aefi_sinop)
 
+# Pie chart for total doses given
 labels = 'Pfizer', 'Astrazeneca', 'Sinovac', 'Sinopharm'
 sizes = [45070100, 5708790, 21584481, 44309]
 

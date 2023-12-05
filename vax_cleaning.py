@@ -70,7 +70,6 @@ df_clean = df_clean.T
 df_clean.to_csv(filepath+'/for_analysis.csv', index=False)
 
 # ANALYTICS, part 1
-
 serious_pfizer = df_clean['pfizer'].loc['daily_serious_npra'] / df_clean['pfizer'].loc['total_doses']
 serious_astra = df_clean['astrazeneca'].loc['daily_serious_npra'] / df_clean['astrazeneca'].loc['total_doses']
 serious_sv = df_clean['sinovac'].loc['daily_serious_npra'] / df_clean['sinovac'].loc['total_doses']
